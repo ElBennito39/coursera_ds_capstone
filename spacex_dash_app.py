@@ -1,4 +1,5 @@
 # Import required libraries
+import re
 import pandas as pd
 import dash
 import dash_html_components as html
@@ -21,6 +22,20 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                 # TASK 1: Add a dropdown list to enable Launch Site selection
                                 # The default select value is for ALL sites
                                 # dcc.Dropdown(id='site-dropdown',...)
+                                ### my edit:
+                                  dcc.Dropdown(id='site - dropdown',
+                                                options=[
+                                                    {'label': 'All Sites', 'value': 'ALL'},
+                                                    {'label': 'CCAFS LC-40', 'value': 'CCAFS LC-40'},
+                                                    {'label': 'VAFB SLC-4E', 'value': 'VAFB SLC-4E'},
+                                                    {'label': 'KSC LC-39A', 'value': 'KSC LC-39A'},
+                                                    {'label': 'CCAFS SLC-40', 'value': 'CCAFS SLC-40'}
+                                                ],
+                                                value='ALL',
+                                                placeholder="Select Launch Site",
+                                                searchable=True
+                                                ),
+                                ###
                                 html.Br(),
 
                                 # TASK 2: Add a pie chart to show the total successful launches count for all sites

@@ -46,14 +46,37 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                 html.P("Payload range (Kg):"),
                                 # TASK 3: Add a slider to select payload range
                                 #dcc.RangeSlider(id='payload-slider',...)
+                                ### my edit:
+                                    dcc.RangeSlider(id='payload-slider',
+                                                    min=0, max=10000, step=1000,
+                                                    marks={0: '0',
+                                                        100: '100'},
+                                                    value=[min_payload, max_payload])
 
                                 # TASK 4: Add a scatter chart to show the correlation between payload and launch success
-                                html.Div(dcc.Graph(id='success-payload-scatter-chart')),
+                                # html.Div(dcc.Graph(id='success-payload-scatter-chart')),
                                 ])
 
 # TASK 2:
 # Add a callback function for `site-dropdown` as input, `success-pie-chart` as output
-
+### my edit:
+@app.callback(Output(component_id='success-pie-chart', component_property='figure'),
+              Input(component_id='site - dropdown', component_property='value'))
+def get_pie_chart(entered_site):
+    filtered_df = spacex_df[spacex_df['Launch Site']==str(entered_site)]
+    if entered_site == 'ALL':
+        fig = px.pie(spacex_df, values='class', 
+        names='Launch Site', 
+        title='Success for Lunch Sites')
+        return fig
+    else:
+        filtered_df = filtered_df.groupby(['Launch Site','class']).size().reset_index(name='class count')
+        fig = px.pie(filtered_df, 
+        values='class count', 
+        names='class', 
+        title='Sucessful Launches for Site: {entered_site}', 
+        color='class')
+        return fig
 # TASK 4:
 # Add a callback function for `site-dropdown` and `payload-slider` as inputs, `success-payload-scatter-chart` as output
 

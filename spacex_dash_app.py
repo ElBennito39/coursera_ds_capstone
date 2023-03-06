@@ -23,7 +23,7 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                 # The default select value is for ALL sites
                                 # dcc.Dropdown(id='site-dropdown',...)
                                 ### my edit:
-                                  dcc.Dropdown(id='site - dropdown',
+                                  dcc.Dropdown(id='site-dropdown',
                                                 options=[
                                                     {'label': 'All Sites', 'value': 'ALL'},
                                                     {'label': 'CCAFS LC-40', 'value': 'CCAFS LC-40'},
@@ -51,17 +51,17 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                                     min=0, max=10000, step=1000,
                                                     marks={0: '0',
                                                         100: '100'},
-                                                    value=[min_payload, max_payload])
+                                                    value=[min_payload, max_payload]),
 
                                 # TASK 4: Add a scatter chart to show the correlation between payload and launch success
-                                # html.Div(dcc.Graph(id='success-payload-scatter-chart')),
+                                html.Div(dcc.Graph(id='success-payload-scatter-chart')),
                                 ])
 
 # TASK 2:
 # Add a callback function for `site-dropdown` as input, `success-pie-chart` as output
 ### my edit:
 @app.callback(Output(component_id='success-pie-chart', component_property='figure'),
-              Input(component_id='site - dropdown', component_property='value'))
+              Input(component_id='site-dropdown', component_property='value'))
 def get_pie_chart(entered_site):
     filtered_df = spacex_df[spacex_df['Launch Site']==str(entered_site)]
     if entered_site == 'ALL':
@@ -79,7 +79,25 @@ def get_pie_chart(entered_site):
         return fig
 # TASK 4:
 # Add a callback function for `site-dropdown` and `payload-slider` as inputs, `success-payload-scatter-chart` as output
-
+@app.callback(Output(component_id='success-payload-scatter-chart', component_property='figure'),
+              [Input(component_id='site-dropdown', component_property='value'), Input(component_id="payload-slider", component_property="value")]
+)
+def get_scatter_chart(entered_site, payload):
+    scatter_df = spacex_df[spacex_df['Payload Mass (kg)'].between(payload[0],payload[1])]
+    if entered_site == 'ALL':
+        fig = px.scatter(scatter_df,
+                         x='Payload Mass (kg)',
+                         y='class',
+                         color='Booster Version Category',
+                         title='Success count on Payload mass for all sites')
+        return fig
+    else:
+        fig = px.scatter(scatter_df[scatter_df['Launch Site']==entered_site],
+                         x='Payload Mass (kg)',
+                         y='class',
+                         color='Booster Version Category',
+                         title='Success count on Payload mass for sites')
+        return fig
 
 # Run the app
 if __name__ == '__main__':
